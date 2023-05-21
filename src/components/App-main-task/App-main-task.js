@@ -4,7 +4,10 @@ import PropTypes from 'prop-types';
 export default class Task extends React.Component {
   state = {
     label: '',
+    
   };
+
+  interval;
 
   onLabelChange = (e) => {
     this.setState({
@@ -20,13 +23,28 @@ export default class Task extends React.Component {
     });
   };
 
+  onPlay = () => {
+    console.log('Play');
+    clearInterval(this.interval);
+    this.interval = setInterval(() => {
+      this.props.onCount();
+    }, 1000);
+  };
+
+  onPause = () => {
+    console.log('Pause');
+    clearInterval(this.interval);
+  };
+  
+
   render() {
-    const { textDescription, textCreated, id, onDeleted, onToggleDone, done, changeTask, changed, taskTimer } =
+    const { textDescription, textCreated, id, minutes, seconds, onDeleted, onToggleDone, done, changeTask, changed, taskTimer, } =
       this.props;
 
     let className = '';
     if (done) {
       className += 'completed';
+      this.onPause();
     }
 
     if (changed) {
@@ -42,8 +60,13 @@ export default class Task extends React.Component {
         <div className="view">
           <input className="toggle" type="checkbox" onClick={onToggleDone} />
           <label>
-            <span className="description">{textDescription}</span>
-            <span className="created">{textCreated}</span>
+            <span className='title'>{textDescription}</span>
+            <span className="description">
+              <button className="icon icon-play" onClick={() => this.onPlay(id)}></button>
+              <button className="icon icon-pause" onClick={this.onPause}></button>
+              {minutes}:{seconds}
+            </span>
+            <span className="description">{textCreated}</span>
           </label>
           <button className="icon icon-edit" onClick={changeTask} />
           <button className="icon icon-destroy" onClick={onDeleted} />

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import Task from '../App-main-task/App-main-task';
 
-function TaskList({ filtredItems, onDeleted, onToggleDone, changeTask, changeTaskText, taskTimer }) {
+function TaskList({ filtredItems, onDeleted, onToggleDone, changeTask, changeTaskText, taskTimer, onCount }) {
   const elements = filtredItems.map((item) => (
     <Task
       key={item.id}
@@ -17,6 +17,9 @@ function TaskList({ filtredItems, onDeleted, onToggleDone, changeTask, changeTas
       changeTask={() => changeTask(item.id)}
       changeTaskText={changeTaskText}
       taskTimer={taskTimer}
+      minutes={item.minutes}
+      seconds={item.seconds}
+      onCount={() => onCount(item.id)}
     />
   ));
 

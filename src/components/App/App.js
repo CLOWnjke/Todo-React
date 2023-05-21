@@ -7,17 +7,18 @@ import Footer from '../App-footer/App-footer';
 
 export default class App extends React.Component {
   maxId = 100;
+  interval;
 
   state = {
     data: [
-      this.createTodoItem('Completed task'),
-      this.createTodoItem('Editing task'),
-      this.createTodoItem('Active task'),
+      this.createTodoItem('First Task', '1', '1'),
+      this.createTodoItem('Second Task', 1, 1),
+      this.createTodoItem('Third task', 1, 1),
     ],
     filter: 'All',
   };
 
-  createTodoItem(textDescription) {
+  createTodoItem(textDescription, minutes, seconds) {
     return {
       textDescription,
       textCreated: '',
@@ -25,6 +26,8 @@ export default class App extends React.Component {
       id: this.maxId++,
       changed: false,
       date: new Date(),
+      minutes,
+      seconds,
     };
   }
 
@@ -40,9 +43,23 @@ export default class App extends React.Component {
     });
   };
 
-  addItem = (label) => {
+  addItem = (label, minutes, seconds) => {
+    if(!minutes.match(/^\d+$/) && !seconds.match(/^\d+$/)) {
+      alert('Неверно указан формат времени');
+      return;
+    }
+    if (seconds > 59) {
+      alert('Секунда не может быть больше 60');
+      return;
+    }
+    if(minutes === '') {
+      alert('вы не ввели время');
+    }
+
+    const newItem = this.createTodoItem(label, minutes, seconds);
+
     this.setState(({ data }) => {
-      const newArr = [...data, this.createTodoItem(label)];
+      const newArr = [...data, newItem];
 
       return {
         data: newArr,
@@ -155,6 +172,33 @@ export default class App extends React.Component {
     }, 1000);
   };
 
+  onCount = (id) => {
+    this.setState(({ data }) => {
+      const idx = data.findIndex((el) => el.id === id);
+      const oldData = data[idx];
+
+      if(oldData.minutes !== 0 & oldData.seconds === 0) {
+        const newData = {...oldData, minutes: oldData.minutes - 1, seconds: 59};
+        const newArr = [...data.slice(0, idx), newData, ...data.slice(idx + 1)];
+        return {
+          data: newArr,
+        };
+      } else if (oldData.minutes == 0 & oldData.seconds === 0) {
+        const newData = {...oldData, minutes: 0, seconds: 0};
+        const newArr = [...data.slice(0, idx), newData, ...data.slice(idx + 1)];
+        return {
+          data: newArr,
+        };
+      } else {
+        const newData = {...oldData, seconds: oldData.seconds - 1};
+        const newArr = [...data.slice(0, idx), newData, ...data.slice(idx + 1)];
+        return {
+          data: newArr,
+        };
+      }
+    });
+  };
+
   render() {
     const doneItems = this.state.data.length - this.state.data.filter((el) => el.done).length;
     const filtredItems = this.filter(this.state.data, this.state.filter);
@@ -169,6 +213,7 @@ export default class App extends React.Component {
           changeTask={this.changeTask}
           changeTaskText={this.changeTaskText}
           taskTimer={this.taskTimer}
+          onCount={this.onCount}
         />
         <Footer
           doneItems={doneItems}
