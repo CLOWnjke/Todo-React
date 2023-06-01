@@ -1,76 +1,67 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 
-export default class AppHeaderInput extends Component {
-  state = {
-    label: '',
-    minutes: '',
-    seconds: ''
+
+function AppHeaderInput({ addItem }) {
+
+  const [label, setLabel] = useState('');
+  const [minutes, setMinutes] = useState('');
+  const [seconds, setSeconds] = useState('');
+
+  // state = {
+  //   label: '',
+  //   minutes: '',
+  //   seconds: ''
+  // };
+
+  const onLabelChange = (e) => {
+    setLabel(e.target.value);
   };
 
-  onLabelChange = (e) => {
-    console.log(e.target.value);
-
-    this.setState({
-      label: e.target.value,
-    });
+  const onMinutesChange = (e) => {
+    setMinutes(e.target.value);
   };
 
-  onMinutesChange = (e) => {
-    console.log(e.target.value);
-    this.setState({
-      minutes: e.target.value
-    });
+  const onSecondsChange = (e) => {
+    setSeconds(e.target.value);
   };
 
-  onSecondsChange = (e) => {
-    console.log(e.target.value);
-    this.setState({
-      seconds: e.target.value
-    });
-    
-  };
-
-  onSubmit = (e) => {
+  const onSubmit = (e) => {
     console.log(e);
     e.preventDefault();
-    this.props.addItem(this.state.label, this.state.minutes, this.state.seconds);
-    this.setState({
-      label: '',
-      minutes: '',
-      seconds: ''
-    });
+    addItem(label, minutes, seconds);
+    setLabel('');
+    setMinutes('');
+    setSeconds('');
   };
 
-  render() {
-    return (
-      <form className="new-todo-form" onSubmit={this.onSubmit} readOnly>
-        <label>
-          <input
-            className="new-todo"
-            placeholder="What needs to be done?"
-            autoFocus
-            onChange={this.onLabelChange}
-            type="text"
-            value={this.state.label}
-          />
-        </label>
+  return (
+    <form className="new-todo-form" onSubmit={onSubmit} readOnly>
+      <label>
         <input
-          className="new-todo-form__timer"
-          placeholder="Min"
+          className="new-todo"
+          placeholder="What needs to be done?"
           autoFocus
-          onChange={this.onMinutesChange}
-          value={this.state.minutes} />
-        <input
-          className="new-todo-form__timer"
-          placeholder="Sec"
-          autoFocus
-          onChange={this.onSecondsChange}
-          value={this.state.seconds} />
-        <input className="new-todo-form__submit" type="submit" />
-      </form>
-    );
-  }
+          onChange={onLabelChange}
+          type="text"
+          value={label}
+        />
+      </label>
+      <input
+        className="new-todo-form__timer"
+        placeholder="Min"
+        autoFocus
+        onChange={onMinutesChange}
+        value={minutes} />
+      <input
+        className="new-todo-form__timer"
+        placeholder="Sec"
+        autoFocus
+        onChange={onSecondsChange}
+        value={seconds} />
+      <input className="new-todo-form__submit" type="submit" />
+    </form>
+  );
 }
 
 AppHeaderInput.defaultProps = {
@@ -80,3 +71,5 @@ AppHeaderInput.defaultProps = {
 AppHeaderInput.propTypes = {
   addItem: PropTypes.func,
 };
+
+export default AppHeaderInput;

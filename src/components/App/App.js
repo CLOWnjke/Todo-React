@@ -1,102 +1,90 @@
-import React from 'react';
+import {React, useEffect, useState} from 'react';
 import { formatDistanceToNow } from 'date-fns';
 
 import AppHeader from '../App-header/App-header';
 import TaskList from '../App-main-task-list/App-main-task-list';
 import Footer from '../App-footer/App-footer';
 
-export default class App extends React.Component {
-  maxId = 100;
-  interval;
+function App() {
+  let maxId = new Date().getTime();
 
-  state = {
-    data: [
-      this.createTodoItem('First Task', '1', '1'),
-      this.createTodoItem('Second Task', 1, 1),
-      this.createTodoItem('Third task', 1, 1),
-    ],
-    filter: 'All',
-  };
+  const [data, setData] = useState([]);
+  const [filter, setFilter] = useState('All');
 
-  createTodoItem(textDescription, minutes, seconds) {
+  // state = {
+  //   data: [
+  //     this.createTodoItem('First Task', '1', '1'),
+  //     this.createTodoItem('Second Task', 1, 1),
+  //     this.createTodoItem('Third task', 1, 1),
+  //   ],
+  //   filter: 'All',
+  // };
+
+  const createTodoItem = function(textDescription, minutes, seconds) {
     return {
       textDescription,
       textCreated: '',
       done: false,
-      id: this.maxId++,
+      id: maxId++,
       changed: false,
       date: new Date(),
       minutes,
       seconds,
     };
-  }
+  };
 
-  deleteItem = (id) => {
-    this.setState(({ data }) => {
+  useEffect(() => {
+
+  });
+
+  const deleteItem = (id) => {
+    setData((data) => {
       const idx = data.findIndex((el) => el.id === id);
-
       const newArr = [...data.slice(0, idx), ...data.slice(idx + 1)];
-
-      return {
-        data: newArr,
-      };
+      return newArr;
     });
   };
 
-  addItem = (label, minutes, seconds) => {
-    if(!minutes.match(/^\d+$/) && !seconds.match(/^\d+$/)) {
-      alert('Неверно указан формат времени');
-      return;
-    }
-    if (seconds > 59) {
-      alert('Секунда не может быть больше 60');
-      return;
-    }
-    if(minutes === '') {
-      alert('вы не ввели время');
-    }
-
-    const newItem = this.createTodoItem(label, minutes, seconds);
-
-    this.setState(({ data }) => {
+  const addItem = (label, minutes, seconds) => {
+    setData((data) => {
+      if(!minutes.match(/^\d+$/) && !seconds.match(/^\d+$/)) {
+        alert('Неверно указан формат времени');
+        return;
+      }
+      if (seconds > 59) {
+        alert('Секунда не может быть больше 60');
+        return;
+      }
+      if(minutes === '') {
+        alert('вы не ввели время');
+      }
+      const newItem = createTodoItem(label, minutes, seconds);
       const newArr = [...data, newItem];
-
-      return {
-        data: newArr,
-      };
+      return newArr;
     });
   };
 
-  onToggleDone = (id) => {
-    this.setState(({ data }) => {
+  const onToggleDone = (id) => {
+    setData((data) => {
       const idx = data.findIndex((el) => el.id === id);
-
       const oldData = data[idx];
-
       const newData = {
         ...oldData,
         done: !oldData.done,
       };
-
       const newArr = [...data.slice(0, idx), newData, ...data.slice(idx + 1)];
-
-      return {
-        data: newArr,
-      };
+      return newArr;
     });
   };
 
-  clearCompleted = () => {
-    this.setState(({ data }) => {
+  const clearCompleted = () => {
+    setData((data) => {
       const newArr = data.filter((el) => !el.done);
-
-      return {
-        data: newArr,
-      };
+      return newArr;
     });
   };
 
-  filter = (items, filter) => {
+  const filtered = (items, filter) => {
     switch (filter) {
       case 'All':
         return items;
@@ -109,119 +97,96 @@ export default class App extends React.Component {
     }
   };
 
-  onFilterChange = (filter) => {
-    this.setState({ filter });
+  const onFilterChange = (filter) => {
+    setFilter(filter);
   };
 
-  changeTask = (id) => {
-    this.setState(({ data }) => {
+  const changeTask = (id) => {
+    setData((data) => {
       const idx = data.findIndex((el) => el.id === id);
-
       const oldData = data[idx];
       const newData = {
         ...oldData,
         changed: !oldData.changed,
       };
-
       const newArr = [...data.slice(0, idx), newData, ...data.slice(idx + 1)];
-
-      return {
-        data: newArr,
-      };
+      return newArr;
     });
   };
 
-  changeTaskText = (id, label) => {
-    this.setState(({ data }) => {
+  const changeTaskText = (id, label) => {
+    setData((data)=> {
       const idx = data.findIndex((el) => el.id === id);
-
       const oldData = data[idx];
-
       const newData = {
         ...oldData,
         changed: !oldData.changed,
         textDescription: label,
       };
-
       const newArr = [...data.slice(0, idx), newData, ...data.slice(idx + 1)];
-
-      return {
-        data: newArr,
-      };
+      return newArr;
     });
   };
 
-  taskTimer = (id) => {
-    setInterval(() => {
-      this.setState(({ data }) => {
-        const idx = data.findIndex((el) => el.id === id);
-        const oldData = data[idx];
-        if (oldData) {
-          const newData = {
-            ...oldData,
-            textCreated: `created ${formatDistanceToNow(new Date(oldData.date), { includeSeconds: true })} ago`,
-          };
-
-          const newArr = [...data.slice(0, idx), newData, ...data.slice(idx + 1)];
-
-          return {
-            data: newArr,
-          };
-        }
-      });
-    }, 1000);
+  const taskTimer = (id) => {
+    setData((data) => {
+      const idx = data.findIndex((el) => el.id === id);
+      const oldData = data[idx];
+      if (oldData) {
+        const newData = {
+          ...oldData,
+          textCreated: `created ${formatDistanceToNow(new Date(oldData.date), { includeSeconds: true })} ago`,
+        };
+        const newArr = [...data.slice(0, idx), newData, ...data.slice(idx + 1)];
+        return newArr;
+      }
+    });
   };
 
-  onCount = (id) => {
-    this.setState(({ data }) => {
+  const onCount = (id) => {
+    setData((data)=> {
       const idx = data.findIndex((el) => el.id === id);
       const oldData = data[idx];
 
       if(oldData.minutes !== 0 & oldData.seconds === 0) {
         const newData = {...oldData, minutes: oldData.minutes - 1, seconds: 59};
         const newArr = [...data.slice(0, idx), newData, ...data.slice(idx + 1)];
-        return {
-          data: newArr,
-        };
+        return newArr;
       } else if (oldData.minutes == 0 & oldData.seconds === 0) {
         const newData = {...oldData, minutes: 0, seconds: 0};
         const newArr = [...data.slice(0, idx), newData, ...data.slice(idx + 1)];
-        return {
-          data: newArr,
-        };
+        return newArr;
       } else {
         const newData = {...oldData, seconds: oldData.seconds - 1};
         const newArr = [...data.slice(0, idx), newData, ...data.slice(idx + 1)];
-        return {
-          data: newArr,
-        };
+        return newArr;
       }
     });
   };
 
-  render() {
-    const doneItems = this.state.data.length - this.state.data.filter((el) => el.done).length;
-    const filtredItems = this.filter(this.state.data, this.state.filter);
+  const doneItems = data ? data.length - data.filter((el) => el.done).length : undefined;
+  const filtredItems = filtered(data, filter);
 
-    return (
-      <section className="todoapp">
-        <AppHeader addItem={this.addItem} />
-        <TaskList
-          filtredItems={filtredItems}
-          onDeleted={this.deleteItem}
-          onToggleDone={this.onToggleDone}
-          changeTask={this.changeTask}
-          changeTaskText={this.changeTaskText}
-          taskTimer={this.taskTimer}
-          onCount={this.onCount}
-        />
-        <Footer
-          doneItems={doneItems}
-          clearCompleted={this.clearCompleted}
-          filter={this.state.filter}
-          onFilterChange={this.onFilterChange}
-        />
-      </section>
-    );
-  }
+  return (
+    <section className="todoapp">
+      <AppHeader addItem={addItem} />
+      <TaskList
+        filtredItems={filtredItems}
+        onDeleted={deleteItem}
+        onToggleDone={onToggleDone}
+        changeTask={changeTask}
+        changeTaskText={changeTaskText}
+        taskTimer={taskTimer}
+        onCount={onCount}
+      />
+      <Footer
+        doneItems={doneItems}
+        clearCompleted={clearCompleted}
+        filter={filter}
+        onFilterChange={onFilterChange}
+      />
+    </section>
+  );
 }
+
+export default App;
